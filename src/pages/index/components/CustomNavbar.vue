@@ -1,7 +1,6 @@
 <script setup lang="ts">
 // 获取屏幕边界 到安全区域的范围
 const { safeAreaInsets } = uni.getSystemInfoSync()
-console.log(safeAreaInsets)
 //
 </script>
 
@@ -29,6 +28,7 @@ console.log(safeAreaInsets)
   display: flex;
   flex-direction: column;
   padding-top: 20px;
+  background-color: #f7f7f7;
   .logo {
     display: flex;
     align-items: center;
