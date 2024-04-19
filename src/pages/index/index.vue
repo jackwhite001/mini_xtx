@@ -2,6 +2,7 @@
 import CustomNavbar from './components/CustomNavbar.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 import HotPanel from './components/HotPanel.vue'
+import skeleton from './components/skeleton.vue'
 import { getHomeBannerAPI, getHomeCategoryAPI, getHomeHotPanelAPI } from '@/services/home'
 import type { BannerItem, CategoryItem, HotPanelItem } from '@/types/home'
 import { onLoad } from '@dcloudio/uni-app'
@@ -15,6 +16,8 @@ const hotPanelList = ref<HotPanelItem[]>([])
 const guessRef = ref<XtxGuessInstance>()
 // 判断是否结束刷新动画
 const isTriggered = ref(false)
+// 页面骨架图是否加载
+const isLoading = ref(false)
 
 const getBanner = async () => {
   const res = await getHomeBannerAPI()
@@ -33,10 +36,12 @@ const getHotPanel = async () => {
   hotPanelList.value = res.result
 }
 
-onLoad(() => {
-  getBanner()
-  getCategory()
-  getHotPanel()
+onLoad(async () => {
+  // 数据加载前 显示骨架图
+  isLoading.value = true
+  await Promise.all([getBanner(), getCategory(), getHotPanel()])
+  // 数据记载完成 关闭骨架图
+  isLoading.value = false
 })
 
 // 滑动触底
@@ -80,14 +85,18 @@ const onRefresherrefresh = async () => {
     class="scroll-view"
     scroll-y
   >
-    <!-- 自定义轮播图 -->
-    <XtxBanner :list="bannerList"></XtxBanner>
-    <!-- 自定义分类面板 -->
-    <CategoryPanel :list="categoryList"></CategoryPanel>
-    <!-- 热门推荐 -->
-    <HotPanel :list="hotPanelList"></HotPanel>
-    <!-- 猜你喜欢 -->
-    <XtxGuess ref="guessRef"></XtxGuess>
+    <!-- 骨架结构 -->
+    <skeleton v-if="false"></skeleton>
+    <template v-else>
+      <!-- 自定义轮播图 -->
+      <XtxBanner :list="bannerList"></XtxBanner>
+      <!-- 自定义分类面板 -->
+      <CategoryPanel :list="categoryList"></CategoryPanel>
+      <!-- 热门推荐 -->
+      <HotPanel :list="hotPanelList"></HotPanel>
+      <!-- 猜你喜欢 -->
+      <XtxGuess ref="guessRef"></XtxGuess>
+    </template>
   </scroll-view>
 </template>
 
