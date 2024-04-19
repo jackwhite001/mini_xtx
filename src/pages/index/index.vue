@@ -60,8 +60,9 @@ const onRefresherrefresh = async () => {
   // 2.全部加载成功 则返回所有promise实例中resolve（）回来带的参数，按数组中一一对应的顺序所集合的数组
   // 若任意有一个失败 ，立即决议失败，将失败的promise实例（reject()中参数）传递给我们；
   // 3.若Promise.all([ ])中，数组为空数组，则立即决议为成功执行resolve( )；
-  await Promise.all([getBanner(), getCategory(), getHotPanel()])
-  console.log('刷新完成')
+  // 重置猜你喜欢数据
+  guessRef.value?.resetData()
+  await Promise.all([getBanner(), getCategory(), getHotPanel(), guessRef.value?.getGuessLike()])
   // 关闭冻哈
   isTriggered.value = false
 }
@@ -98,6 +99,7 @@ page {
   display: flex;
   flex-direction: column;
 }
+
 .scroll-view {
   flex: 1;
 }
