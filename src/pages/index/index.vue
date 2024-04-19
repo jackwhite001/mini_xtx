@@ -13,6 +13,8 @@ const categoryList = ref<CategoryItem[]>([])
 const hotPanelList = ref<HotPanelItem[]>([])
 // 获取猜你喜欢实例 创建组件实例
 const guessRef = ref<XtxGuessInstance>()
+// 判断是否结束刷新动画
+const isTriggered = ref(false)
 
 const getBanner = async () => {
   const res = await getHomeBannerAPI()
@@ -41,13 +43,42 @@ onLoad(() => {
 const onScrolltolower = async () => {
   guessRef.value?.getGuessLike()
 }
+// 自定义下拉刷新 内触发
+const onRefresherrefresh = async () => {
+  // console.log('自定义下拉菜单被刷新')
+  // 重新加载页面数据
+  // 开始动画
+  isTriggered.value = true
+  //树新数据
+  // await getBanner()
+  // await getCategory()
+  // await getHotPanel()
+  // 采用 promise.all 多次请求
+  //   Promise.all()
+  // 1、Promise.all方法可以把多个promise实例包装成一个新的promise实例；
+  // Promise.all([promise1,promise2]):Promise---最终返回Promise实例；
+  // 2.全部加载成功 则返回所有promise实例中resolve（）回来带的参数，按数组中一一对应的顺序所集合的数组
+  // 若任意有一个失败 ，立即决议失败，将失败的promise实例（reject()中参数）传递给我们；
+  // 3.若Promise.all([ ])中，数组为空数组，则立即决议为成功执行resolve( )；
+  await Promise.all([getBanner(), getCategory(), getHotPanel()])
+  console.log('刷新完成')
+  // 关闭冻哈
+  isTriggered.value = false
+}
 </script>
 
 <template>
   <!-- 自定义导航 -->
   <CustomNavbar></CustomNavbar>
   <!-- 滚动容器 -->
-  <scroll-view @scrolltolower="onScrolltolower" class="scroll-view" scroll-y>
+  <scroll-view
+    refresher-enabled
+    @refresherrefresh="onRefresherrefresh"
+    @scrolltolower="onScrolltolower"
+    :refresher-triggered="isTriggered"
+    class="scroll-view"
+    scroll-y
+  >
     <!-- 自定义轮播图 -->
     <XtxBanner :list="bannerList"></XtxBanner>
     <!-- 自定义分类面板 -->

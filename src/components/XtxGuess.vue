@@ -11,7 +11,7 @@ const finish = ref(false)
 //// 分页参数 将可选参数转为 必选  使用泛型工具 Required
 // 防止数据出现undefined 无法操作
 const pageParams: Required<PageParams> = {
-  page: 29,
+  page: 1,
   pageSize: 10,
 }
 // 获取猜你喜欢数据
@@ -70,7 +70,7 @@ defineExpose({
       </view>
     </navigator>
   </view>
-  <view class="loading-text"> {{ finish ? '已经加载完成~':'正在加载...' }} </view>
+  <view class="loading-text"> {{ finish ? '已经加载完成~' : '正在加载...' }} </view>
 </template>
 
 <style lang="scss">
