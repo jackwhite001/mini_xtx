@@ -2,7 +2,7 @@
 import CustomNavbar from './components/CustomNavbar.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 import HotPanel from './components/HotPanel.vue'
-import skeleton from './components/skeleton.vue'
+import Skeleton from './components/Skeleton.vue'
 import { getHomeBannerAPI, getHomeCategoryAPI, getHomeHotPanelAPI } from '@/services/home'
 import type { BannerItem, CategoryItem, HotPanelItem } from '@/types/home'
 import { onLoad } from '@dcloudio/uni-app'
@@ -86,7 +86,7 @@ const onRefresherrefresh = async () => {
     scroll-y
   >
     <!-- 骨架结构 -->
-    <skeleton v-if="false"></skeleton>
+    <skeleton v-if="isLoading"></skeleton>
     <template v-else>
       <!-- 自定义轮播图 -->
       <XtxBanner :list="bannerList"></XtxBanner>
