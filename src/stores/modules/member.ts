@@ -12,11 +12,6 @@ export const useMemberStore = defineStore(
     // 保存会员信息，登录时使用
     const setProfile = (val: LoginResult) => {
       profile.value = val
-      console.log(val)
-      uni.showToast({
-        title: '登录成功',
-        icon: 'success',
-      })
     }
 
     // 清理会员信息，退出时使用

@@ -7,13 +7,11 @@ import { getHomeBannerAPI, getHomeCategoryAPI, getHomeHotPanelAPI } from '@/serv
 import type { BannerItem, CategoryItem, HotPanelItem } from '@/types/home'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
-import type { XtxGuessInstance } from '@/types/component'
+import { useGuessList } from '@/composables'
 
 const bannerList = ref<BannerItem[]>([])
 const categoryList = ref<CategoryItem[]>([])
 const hotPanelList = ref<HotPanelItem[]>([])
-// 获取猜你喜欢实例 创建组件实例
-const guessRef = ref<XtxGuessInstance>()
 // 判断是否结束刷新动画
 const isTriggered = ref(false)
 // 页面骨架图是否加载
@@ -44,10 +42,8 @@ onLoad(async () => {
   isLoading.value = false
 })
 
-// 滑动触底
-const onScrolltolower = async () => {
-  guessRef.value?.getGuessLike()
-}
+// 获取分页
+const { guessRef, onScrolltolower } = useGuessList()
 // 自定义下拉刷新 内触发
 const onRefresherrefresh = async () => {
   // console.log('自定义下拉菜单被刷新')
