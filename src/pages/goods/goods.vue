@@ -188,10 +188,10 @@ const onAddCart = async (ev: SkuPopupEvent) => {
         </view>
         <!-- 图片详情 -->
         <image
-          v-for="item in goods?.details.pictures"
-          :key="item"
+          v-for="items in goods?.details.pictures"
+          :key="items"
           mode="widthFix"
-          :src="item"
+          :src="items"
         ></image>
       </view>
     </view>
@@ -203,17 +203,17 @@ const onAddCart = async (ev: SkuPopupEvent) => {
       </view>
       <view class="content">
         <navigator
-          v-for="item in goods?.similarProducts"
-          :key="item.id"
+          v-for="itemss in goods?.similarProducts"
+          :key="itemss.id"
           class="goods"
           hover-class="none"
-          :url="`/pages/goods/goods?id=${item.id}`"
+          :url="`/pages/goods/goods?id=${itemss.id}`"
         >
-          <image class="image" mode="aspectFill" :src="item.picture"></image>
-          <view class="name ellipsis">{{ item.name }}</view>
+          <image class="image" mode="aspectFill" :src="itemss.picture"></image>
+          <view class="name ellipsis">{{ itemss.name }}</view>
           <view class="price">
             <text class="symbol">¥</text>
-            <text class="number">{{ item.price }}</text>
+            <text class="number">{{ itemss.price }}</text>
           </view>
         </navigator>
       </view>
@@ -227,7 +227,7 @@ const onAddCart = async (ev: SkuPopupEvent) => {
       <button class="icons-button" open-type="contact">
         <text class="icon-handset"></text>客服
       </button>
-      <navigator class="icons-button" url="/pages/cart/cart" open-type="switchTab">
+      <navigator class="icons-button" url="/pages/cart/cart2" open-type="navigate">
         <text class="icon-cart"></text>购物车
       </navigator>
     </view>
