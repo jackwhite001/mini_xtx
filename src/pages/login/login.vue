@@ -38,7 +38,9 @@ const loginSuccess = (profile: LoginResult) => {
   })
   setTimeout(() => {
     // 页面跳转
-    uni.switchTab({ url: '/pages/my/my' })
+    // uni.switchTab({ url: '/pages/my/my' })
+    // 跳转回 上一页从哪里打开回哪里
+    uni.navigateBack()
   }, 500)
 }
 </script>
