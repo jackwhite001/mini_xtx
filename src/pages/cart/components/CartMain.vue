@@ -78,7 +78,7 @@ const selectedCartListCount = computed(() => {
 const selectedCartListPrice = computed(() => {
   return selectedCartList.value.reduce((pre, cur) => pre + cur.count * cur.nowPrice, 0).toFixed(2)
 })
-//
+// 结算按钮 进入订单页
 const gotoPayment = () => {
   if (!selectedCartListCount.value) {
     return uni.showToast({
@@ -90,6 +90,11 @@ const gotoPayment = () => {
   uni.showToast({
     title: '等待完成',
   })
+  setTimeout(() => {
+    uni.navigateTo({
+      url: '/pagesOrder/create/create',
+    })
+  }, 400)
 }
 </script>
 

@@ -1,8 +1,35 @@
 <script setup lang="ts">
-//
+import { useAddressStore } from '@/stores/modules/address'
+import type { AddressItem } from '@/types/address'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import { computed, provide, ref } from 'vue'
+const addressStore = useAddressStore()
+addressStore.$patch(() => {
+  addressStore.selectedAddress = addressStore.addressList.find((v) => v.isDefault)
+})
 const emit = defineEmits<{
   (event: 'close'): void
 }>()
+const address = defineProps<{
+  addressList: AddressItem[]
+}>()
+
+const selectedAdd = computed(() => {
+  return addressStore.selectedAddress
+})
+// 用来修改地址的函数
+const onChangeAddress = (item: AddressItem) => {
+  // 管理修改地址的仓库
+  addressStore.changeSelectedAddress(item)
+}
+// 确认选择地址
+const onConfirm = () => {
+  emit('close')
+}
+defineExpose({
+  selectedAdd,
+})
+// console.log(address)
 </script>
 
 <template>
@@ -13,25 +40,22 @@ const emit = defineEmits<{
     <view class="title">配送至</view>
     <!-- 内容 -->
     <view class="content">
-      <view class="item">
-        <view class="user">李明 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-checked"></text>
-      </view>
-      <view class="item">
-        <view class="user">王东 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-ring"></text>
-      </view>
-      <view class="item">
-        <view class="user">张三 13824686868</view>
-        <view class="address">北京市朝阳区孙河安平北街6号院</view>
-        <text class="icon icon-ring"></text>
+      <view
+        class="item"
+        v-for="item in address.addressList"
+        :key="item.id"
+        @tap="($event) => onChangeAddress(item)"
+      >
+        <view class="user">{{ item.receiver }} {{ item.contact }}</view>
+        <view class="address">{{ item.fullLocation }} {{ item.address }}</view>
+        <text class="icon" :class="selectedAdd!.id === item.id ? 'icon-checked' : ''"></text>
       </view>
     </view>
     <view class="footer">
       <view class="button primary"> 新建地址 </view>
-      <view v-if="false" class="button primary">确定</view>
+      <view v-if="address.addressList.length !== 0" @tap="onConfirm" class="button primary"
+        >确定</view
+      >
     </view>
   </view>
 </template>

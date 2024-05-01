@@ -1,23 +1,14 @@
 <script setup lang="ts">
 import { deleteMemberAddressByIdAPI, getMemberAddressAPI } from '@/services/address'
+import { useAddressStore } from '@/stores/modules/address'
 import type { AddressItem } from '@/types/address'
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { provide, ref } from 'vue'
+const AddressStore = useAddressStore()
 
-const addressList = ref<AddressItem[]>()
-// 获取收货地址列表数据
-const getMemberAddress = async () => {
-  const res = await getMemberAddressAPI()
-  // console.log(res)
-  addressList.value = res.result
-  let isDefault = addressList.value.every((item) => item.isDefault === 0)
-  if (isDefault) {
-    addressList.value[0].isDefault = 1
-  }
-}
 // onSHow 每次页面展示 都会执行 初始化使用
 onShow(() => {
-  getMemberAddress()
+  AddressStore.getMemberAddress()
 })
 // 删除收获地址函数
 const onDeleteAddress = (id: string) => {
@@ -29,10 +20,19 @@ const onDeleteAddress = (id: string) => {
         // 根据id删除收货地址
         await deleteMemberAddressByIdAPI(id)
         // 重新获取收货地址
-        await getMemberAddress()
+        AddressStore.getMemberAddress()
       }
     },
   })
+}
+// 用来修改地址的函数
+const onChangeAddress = (item: AddressItem) => {
+  // console.log(item)
+  // 管理修改地址的仓库
+  AddressStore.changeSelectedAddress(item)
+  // console.log(AddressStore.selectedAddress)
+  // 跳转页面 返回上一级
+  uni.navigateBack()
 }
 </script>
 
@@ -40,11 +40,15 @@ const onDeleteAddress = (id: string) => {
   <view class="viewport">
     <!-- 地址列表 -->
     <scroll-view class="scroll-view" scroll-y>
-      <view v-if="addressList.length" class="address">
+      <view v-if="AddressStore.addressList?.length" class="address">
         <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
-          <uni-swipe-action-item class="item" v-for="item in addressList" :key="item.id">
-            <view class="item-content">
+          <uni-swipe-action-item
+            class="item"
+            v-for="item in AddressStore.addressList"
+            :key="item.id"
+          >
+            <view class="item-content" @tap="($event) => onChangeAddress(item)">
               <view class="user">
                 {{ item.receiver }}
                 <text class="contact">{{ item.contact }}</text>
@@ -55,6 +59,7 @@ const onDeleteAddress = (id: string) => {
                 class="edit"
                 hover-class="none"
                 :url="`/pagesMember/address-form/address-form?id=${item.id}&isDefault=${item.isDefault}`"
+                @tap.stop="() => {}"
               >
                 > 修改
               </navigator>
