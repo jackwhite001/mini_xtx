@@ -96,10 +96,12 @@ const onOrderPay = async (id: string) => {
     const res = await getPayMockAPI({ orderId: id })
     // console.log(res)
   } else {
+    // #ifdef MP-WEIXIN
     // 生产环境
     const res = await getPayWxPayMiniPayAPI({ orderId: id })
     // 正式生产环境 开发
     wx.requestPayment(res.result)
+    // #endif
   }
   // 成功提示
   uni.showToast({ title: '支付成功' })
@@ -110,7 +112,6 @@ const onOrderPay = async (id: string) => {
 </script>
 
 <style scoped lang="scss">
-// 订单列表
 .orders {
   .card {
     min-height: 100rpx;

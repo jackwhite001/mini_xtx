@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// #ifdef H5
+import regionPicker from '@/components/region-picker/region-picker.vue'
+// #endif
 import { getMemberProfileAPI, putMemberProfileAPI } from '@/services/profile'
 import { useMemberStore } from '@/stores'
 import type { Gender, ProfileDetail } from '@/types/member'
@@ -62,7 +65,7 @@ const onBirthdayChange: UniHelper.DatePickerOnChange = (ev) => {
 // 修改城市 添加默认值
 let fullLocationCode: [string, string, string] = ['', '', '']
 const onFullLocationChange: UniHelper.RegionPickerOnChange = (ev) => {
-  console.log(ev)
+  // console.log(ev)
   profile.value.fullLocation = ev.detail.value.join(' ')
   // 提交后端更新
   fullLocationCode = ev.detail.code!
@@ -146,6 +149,7 @@ const onSubmit = async () => {
         </view>
         <view class="form-item">
           <text class="label">城市</text>
+          <!-- #ifdef MP-WEIXIN -->
           <picker
             @change="onFullLocationChange"
             class="picker"
@@ -155,6 +159,17 @@ const onSubmit = async () => {
             <view v-if="profile?.fullLocation">{{ profile?.fullLocation }}</view>
             <view class="placeholder" v-else>请选择城市</view>
           </picker>
+          <!-- #endif -->
+          <!-- #ifdef H5 -->
+          <region-picker
+            @change="onFullLocationChange"
+            class="picker"
+            :value="profile?.fullLocation?.split(' ')"
+          >
+            <view v-if="profile?.fullLocation">{{ profile?.fullLocation }}</view>
+            <view class="placeholder" v-else>请选择城市</view>
+          </region-picker>
+          <!-- #endif -->
         </view>
         <view class="form-item">
           <text class="label">职业</text>

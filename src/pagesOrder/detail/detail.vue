@@ -10,7 +10,7 @@ import {
 } from '@/services/order'
 import { OrderState, orderStateList } from '@/services/contants'
 import type { LogisticItem, OrderResult } from '@/types/order'
-import { onLoad, onReady } from '@dcloudio/uni-app'
+import { onLoad, onReady, onShow } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 // 订单数据
@@ -68,7 +68,7 @@ const getMemberOrderById = async () => {
   order.value = res.result
   if (
     [OrderState.DaiShouHuo, OrderState.DaiPingJia, OrderState.YiWanCheng].includes(
-      order.value.orderState,
+      order.value!.orderState,
     )
   ) {
     // console.log('获取成功')
@@ -95,20 +95,21 @@ const onOrderPay = async () => {
   if (import.meta.env.DEV) {
     // 开发环境模拟支付
     const res = await getPayMockAPI({ orderId: query.id })
-    // console.log(res)
   } else {
+    // #ifdef MP-WEIXIN
     // 生产环境
     const res = await getPayWxPayMiniPayAPI({ orderId: query.id })
     // 正式生产环境 开发
     wx.requestPayment(res.result)
+    // #endif
+    await getPayMockAPI({ orderId: query.id })
   }
-
   // console.log(res)
   // 先关闭当前页面，，在跳转到支付页面
   uni.redirectTo({ url: `/pagesOrder/payment/payment?id=${query.id}` })
 }
 // 是否是开发环境
-const isDev = import.meta.env.DEV
+const isDev = true //import.meta.env.DEV
 // 模拟发话
 const onOrderSend = async () => {
   if (isDev) {
@@ -116,6 +117,13 @@ const onOrderSend = async () => {
     uni.showToast({ title: '模拟发货完成', icon: 'success' })
     // 主动更改订单状态
     order.value!.orderState = OrderState.DaiShouHuo
+    await getMemberOrderById()
+  } else {
+    await getMemberOrderConsignmentByIdAPI(query.id)
+    uni.showToast({ title: '模拟发货完成', icon: 'success' })
+    // 主动更改订单状态
+    order.value!.orderState = OrderState.DaiShouHuo
+    await getMemberOrderById()
   }
 }
 // 确认订单收获按钮

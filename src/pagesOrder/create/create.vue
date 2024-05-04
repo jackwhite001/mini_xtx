@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { getMemberOrderPreAPI, getMemberOrderPreNowAPI, postMemberOrderAPI } from '@/services/order'
+import {
+  getMemberOrderPreAPI,
+  getMemberOrderPreNowAPI,
+  getMemberOrderRepurchaseByIdAPI,
+  postMemberOrderAPI,
+} from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
+import { useOrderStore } from '@/stores/modules/orderStore'
 import type { OrderPreResult } from '@/types/order'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
 
 // 获取屏幕边界到安全区域距离
@@ -26,21 +32,50 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
   activeIndex.value = ev.detail.value
 }
 const query = defineProps<{
-  skuId: string
-  count: string
-  addressId: string
+  skuId?: string
+  count?: string
+  addressId?: string
+  orderId?: string
 }>()
+const OrderStore = useOrderStore()
+OrderStore.getOrderParams({ skuId: query.skuId, count: query!.count })
 // 获取订单信息
 const getMemberOrderPre = async () => {
+  // if (query.count && query.skuId) {
+  //   const res = await getMemberOrderPreNowAPI({skuId:query.skuId,count:query.count})
+  //   orderPre.value = res.result
+  // } else {
+  //   const res = await getMemberOrderPreAPI()
+  //   orderPre.value = res.result
+  // }
+  // const getMemberOrderPreData = async () => {
   if (query.count && query.skuId) {
-    const res = await getMemberOrderPreNowAPI(query)
+    // 立即购买
+    const res = await getMemberOrderPreNowAPI({
+      count: query.count,
+      skuId: query.skuId,
+    })
+    orderPre.value = res.result
+    // 新增
+  } else if (OrderStore.orderParams!.count && OrderStore.orderParams!.skuId) {
+    const res = await getMemberOrderPreNowAPI({
+      count: OrderStore.orderParams!.count,
+      skuId: OrderStore.orderParams!.skuId,
+    })
+    orderPre.value = res.result
+  } else if (query.orderId) {
+    // 再次购买
+    const res = await getMemberOrderRepurchaseByIdAPI(query.orderId)
     orderPre.value = res.result
   } else {
+    // 预付订单
     const res = await getMemberOrderPreAPI()
     orderPre.value = res.result
   }
+  // }
+  // console.log(orderPre.value)
 }
-onLoad(() => {
+onShow(() => {
   getMemberOrderPre()
 })
 //
@@ -69,7 +104,7 @@ const onOrderSubmit = async () => {
     payChannel: 2,
     payType: 1,
   })
-  // console.log(res)
+  // console.log('有效商品', res)
   // 关闭当前页面 跳转到订单详情页面
   uni.redirectTo({ url: `/pagesOrder/detail/detail?id=${res.result.id}` })
 }
